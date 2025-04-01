@@ -1,0 +1,22 @@
+---
+title: "Mi sitio"
+format: 
+  html:
+    number-sections: true
+    toc: true
+    embed-resources: true
+    author: "Víctor Gauto"
+    lang: es
+---
+
+# Título principal
+
+Contenido
+
+## Sección
+
+Contenido sección
+
+## Otra sección
+
+Contenido otra sección
