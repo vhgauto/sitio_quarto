@@ -32,3 +32,29 @@ Contenido sección
 ## Otra sección
 
 Contenido otra sección
+
+[Creación de HTML](https://quarto.org/docs/output-formats/html-basics.html)
+
+[Agregar tema a HTML](https://quarto.org/docs/output-formats/html-themes.html)
+
+[Uso de markdown](https://quarto.org/docs/authoring/markdown-basics.html)
+
+# Ejecución de código
+
+## Python
+
+```{python}
+import pandas as pd
+
+a = pd.DataFrame([1, 2, 3], index=["a", "b", "c"])
+
+print(a)
+```
+
+## R
+
+```{r}
+library(tibble)
+
+tibble(x = 1:3)
+```
