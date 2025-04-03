@@ -5,7 +5,10 @@ format:
     number-sections: true
     toc: true
     embed-resources: true
+    crossrefs-hover: false
     lang: es
+    bibliography: bibliografia/bibliografia.bib
+    csl: bibliografia/ieee.csl
 date: last-modified
 author:
   - name: Víctor Gauto
@@ -21,17 +24,7 @@ author:
         url: https://ig.conae.unc.edu.ar/
 ---
 
-# Título principal
-
-Contenido
-
-## Sección
-
-Contenido sección
-
-## Otra sección
-
-Contenido otra sección
+# Links útiles
 
 [Creación de HTML](https://quarto.org/docs/output-formats/html-basics.html)
 
@@ -39,7 +32,39 @@ Contenido otra sección
 
 [Uso de markdown](https://quarto.org/docs/authoring/markdown-basics.html)
 
+[Agregar figuras](https://quarto.org/docs/authoring/figures.html)
+
+[Agregar tablas](https://quarto.org/docs/authoring/tables.html)
+
+Ver @fig-logo.
+
+## Sección
+
+Ver @tbl-tabla.
+
+::: {.callout-warning}
+
+Advertencia @Ferral2018.
+
+:::
+
+::: {.callout-note}
+
+[Bloques callout](https://quarto.org/docs/authoring/callouts.html).
+
+:::
+
+
+## Otra sección
+
+Contenido otra sección @Wang2023.
+
 # Ejecución de código
+
+$$
+y = x + \frac{numerador}{denominador} + \int_{0}^{1} f(x) \, dx
+$$
+
 
 ## Python
 
@@ -58,3 +83,21 @@ library(tibble)
 
 tibble(x = 1:3)
 ```
+
+# Tabla
+
+| columna1 | columna2 | columna3 |
+|---|---|---|
+| a1 | b2 | c3 |
+| d4 | e5 | f6 |
+
+: Tabla con columnas {#tbl-tabla}
+
+[Crear mis propias tablas](https://www.tablesgenerator.com/markdown_tables).
+
+# Imagen
+
+![Logo del GISTAQ](img/logo-gistaq.png){width=50% #fig-logo}
+
+# Referencia
+
