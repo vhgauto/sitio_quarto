@@ -38,13 +38,23 @@ author:
 
 Ver @fig-logo.
 
-## Sección
+## Markdown
+
+Texto en **negrita**, *cursiva*, ~~tachado~~ y `código`.
+
+* Lista
+  - Ítem 1
+  - Ítem 2
+    + Subítem 1
+    + Subítem 2
+
+## Callout
 
 Ver @tbl-tabla.
 
 ::: {.callout-warning}
 
-Advertencia @Ferral2018.
+Advertencia.
 
 :::
 
@@ -54,17 +64,24 @@ Advertencia @Ferral2018.
 
 :::
 
+## Referencias cruzadas
 
-## Otra sección
+Según autores @Wang2023. Otro autor @Ferral2018.
 
-Contenido otra sección @Wang2023.
+Ver @fig-logo.
 
-# Ejecución de código
+Ver @tbl-tabla.
+
+## LaTeX
 
 $$
 y = x + \frac{numerador}{denominador} + \int_{0}^{1} f(x) \, dx
 $$
 
+
+# Ejecución de código
+
+Se puede agregar scripts y ejecutarlos mostrando sus resultados.
 
 ## Python
 
