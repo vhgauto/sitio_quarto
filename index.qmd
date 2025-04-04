@@ -107,7 +107,7 @@ tibble(x = 1:3)
 # Tabla
 
 | columna1 | columna2 | columna3 |
-|---|---|---|
+|:-:|:--|--:|
 | a1 | b2 | c3 |
 | d4 | e5 | f6 |
 
@@ -117,4 +117,4 @@ tibble(x = 1:3)
 
 # Imagen
 
-![Logo del GISTAQ](img/logo-gistaq.png){width=50% #fig-logo}
+![Logo del GISTAQ](img/logo-gistaq.png){width=40% #fig-logo}
