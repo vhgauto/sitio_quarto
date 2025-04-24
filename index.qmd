@@ -1,5 +1,6 @@
 ---
-title: "El nombre adecuado"
+title: "Desarrollo de modelo de regresión lineal simple"
+subtitle: "Ejemplo de aplicación en Python y R"
 format: 
   html:
     number-sections: true
@@ -24,99 +25,193 @@ keywords:
   - UTN
   - FRRe
   - Quarto
+jupyter: python3
+knitr: true
 ---
 
+<!-- Instalo los paquetes de Python en un *environment* (`sklearn-env`). -->
 
-## Descripción de la propiedad
+```{r}
+#| eval: false
+#| echo: false
 
-La turbidez se refiere a la opacidad o falta de claridad en un líquido provocada por la presencia de partículas suspendidas. Este fenómeno es un indicador clave en el monitoreo de la calidad del agua y su influencia en diferentes ecosistemas es significativa.
+reticulate::conda_create(
+  envname = "sklearn-env",
+  packages = c("scikit-learn", "matplotlib")
+)
+```
 
-La turbidez es un indicador de la calidad del agua, reflejando la presencia de partículas en suspensión. Su medición es crucial para garantizar la potabilidad del agua y la salud de los ecosistemas acuáticos. Este fenómeno puede ser resultado de diversas causas, como la erosión del suelo, la actividad biológica y la contaminación. La comprensión de la turbidez y su impacto es esencial para la gestión de recursos hídricos y la protección del medio ambiente.
 
-La turbidez viene determinada por la dispersión de la luz causada por la materia suspendida en el agua, se obtiene normalmente mediante un turbidímetro, que proporciona medidas en Nephelometric Turbidity Unit (NTU) y mide la dispersión de un rayo de luz en el agua a 90º de la luz incidente [@Delegido2019].
+```{r}
+#| echo: false
+#| warning: false
 
-Muchas propiedades, como la clorofila-a (Chl-a), sólidos suspendidos totales (SST) y la materia orgánica disuelta coloreada (CDOM), se utilizan a menudo como indicadores del estado del agua. Estos constituyentes del agua a su vez son responsables de la turbidez.
+library(reticulate)
+reticulate::use_python(
+  "C:\\Users\\victo\\anaconda3\\envs\\sklearn-env/python.exe"
+)
+```
 
-Existe una fuerte correlación entre turbidez y sólidos suspendidos totales, por lo que se puede estimar SST a partir de la turbidez. Por lo general, es una relación directa, a mayor concentración de SST mayor turbidez.
+Diferentes metodologías para la resolución de una regresión simple por el método de mínimos cuadrados.
 
-Existe una relación inversa entre la Turbidez y la profundidad del disco de Secchi (a valores bajos de secchi mayor turbidez), por lo que también se puede estimar turbidez a partir de mediciones de disco de secchi.
+## **Python**, con `sklearn`
 
-### Métodos tradicionales
+Se muestra a continuación el tutorial mostrado en para el modelo [Mínimos cuadrados ordinarios](https://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html#ordinary-least-squares-example).
 
-:::: {.content-visible when-format="html"}
+Importo la librería `sklearn`, funciones de interés y para generar figuras.
 
-::: {.column-screen-right}
-<!-- TODO corregir <br> de la ecuación -->
-| Ecuación | Bandas (nm) | Métricas | Aguas | Plataforma | Referencia |
-|:-:|:--|:--|:--|:--|:-:|
-| $1.559e^{35.533 \cdot B03} \\ 1.879e^{37.745(B03 \cdot B5)/(B04+B12)}$ | B03, B04, B05, B12 | $R^{2}$, RMSE, MAE | Lago^[0,83 - 112,26 NTU.] | Sentinel-2 | @Ma2021 |
-| $2677.2 \cdot B04^{1.856}$ | B04 | $R^{2}$, RMSE, Bias | Interiores variadas^[2,3 - 107,02 NTU.] | Landsat-8 | @Hossain2021 |
-| $969-1.5468 \cdot R_{1200nm}+2.07 \frac{B8A}{B02}$ | B02, B8A, 1200nm | IOA, SI, RMSE, MAE | Río^[IOA = index of agreement<br>SI = scatter index.] | Landsat-8 | @Najafzadeh2023 |
-| $y=-1.1+5.8 \frac{B02}{B04} \\ y=3.896-4.186 \frac{B02}{B03}$ | B02, B03, B04 | $R^{2}$, RMSE | Río^[20,6 - 112 NTU<br>2,3 - 15,4 NTU.] | Landsat-8 | @Allam2020 |
-| $y=37661 \cdot B8A^{2}+1845 \cdot B8A <br> y=531.5- \frac{B04}{0.88}$ | B04, B8A | $R^{2}$, RMSE, MAPE | Estuario^[MAPE = Mean Absolute Percentage Error<br>0 - 1300 NTU<br>0 - 80 NTU.] | Pléiades | @Luo2020 |
+```{python}
+from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+```
 
-: Características principales de algoritmos tradicionales para la estimación de turbidez. {#tbl-turb-trad .striped .hover tbl-colwidths="[50,10,10,10,10]"}
+Utilizo el conjunto de datos `diabetes`. Lo divido en entrenamiento y validación.
 
-:::
+```{python}
+X, y = load_diabetes(return_X_y=True)
+X = X[:, [2]]  # Use only one feature
+X_train, X_test, y_train, y_test = train_test_split(
+  X, y, test_size=20, shuffle=False
+)
+```
 
-::::
+Creo un modelo de regresión y ajusto a los datos de entrenamiento.
 
-Múltiples modelos (lineal, logaritmos, inversa, cuadrática, exponencial, potencial) y plataformas (Sentinel-2, Landsat-5 y Landsat-8) emplean el cociente de bandas B04/B03 [@Shen2021].
+```{python}
+regressor = LinearRegression().fit(X_train, y_train)
+```
 
-Modelos de estimación a partir de Sentinel-2 y Landsat-8 utilizan regresiones lineales, cuadráticas y logarítmicas empleando B02, B03, B04, B01 (con menos apariciones) y cocientes entre éstas [@Ouma2020].
+Evalúo el modelo a partir de las **métricas de desempeño**.
 
-### Métodos de aprendizaje automático
+```{python}
+y_pred = regressor.predict(X_test)
+p_rmse = mean_squared_error(y_test, y_pred)
+p_r2 = r2_score(y_test, y_pred)
+```
 
-El aprendizaje automático es un subconjunto de la inteligencia artificial que permite que un sistema aprenda y mejore de forma autónoma, sin necesidad de una programación explícita, a través del análisis de grandes cantidades de datos. El aprendizaje automático permite que los sistemas informáticos se ajusten y mejoren continuamente a medida que acumulan más "experiencias". Por lo tanto, el rendimiento de estos sistemas puede mejorar si se proporcionan conjuntos de datos más grandes y variados para su procesamiento.
+::: {.callout-note icon="false" title="Métricas de desempeño"}
 
-Cuando se entrenan modelos de machine learning, cada conjunto de datos y cada modelo necesitan un conjunto diferente de "hiperparámetros".
-Los hiperparámetros son variables de configuración externa que se utilizan para administrar el entrenamiento de modelos de machine learning. Controlan de forma directa la estructura, funciones y rendimiento de los modelos.
-Los hiperparámetros son los parámetros de un modelo de aprendizaje automático, que no se aprenden durante el entrenamiento, sino que se establecen antes de que comience.
+El error cuadrático medio es: `{r} round(py$p_rmse, 3)`.
 
-El "ajuste de hiperparámetros" permite modificar el rendimiento del modelo para lograr resultados óptimos. Este proceso es una parte fundamental del machine learning.
-El ajuste de hiperparámetros puede ser manual o automático. A pesar de que el ajuste manual es lento y tedioso, permite entender mejor cómo afectan al modelo las ponderaciones de los hiperparámetros. El proceso de ajuste de hiperparámetros es iterativo, y debe probar diferentes combinaciones de parámetros y valores.
-
-En el aprendizaje automático es importante utilizar técnicas de "validación cruzada" , de modo que el modelo no se centre únicamente en una única porción de sus datos.
-La validación cruzada o cross-validation es una técnica utilizada para evaluar los resultados de un análisis estadístico y garantizar que son independientes de la partición entre datos de entrenamiento y prueba.
-La idea básica de la validación cruzada es dividir los datos en conjuntos de entrenamiento y validación, y luego entrenar el modelo en el conjunto de entrenamiento y evaluar su rendimiento en el conjunto de validación. Este proceso se repite varias veces, con diferentes subconjuntos de los datos utilizados para el entrenamiento y la validación, y se calcula el rendimiento promedio.
-
-En los procesos de machine learning supervisado se utilizan diversos algoritmos y técnicas de cálculo, generalmente calculados mediante el uso de programas como R o Python.
-
-Dependiendo del tipo de datos que se usen para el entrenamiento, será de modelo de aprendizaje automático que se use.
-A grandes rasgos, existen tres tipos de modelos que se usan en el aprendizaje automático: aprendizaje supervisado , no supervisado y por refuerzo.
-
-Consultando el trabajo de otros investigadores, se observa que utilizan principalmente el aprendizaje automático supervisado.
-Este tipo aprendizaje supervisado utiliza un conjunto de entrenamiento para enseñar a los modelos a producir el resultado deseado. Este conjunto de datos de entrenamiento incluye entradas y salidas correctas, que permiten al modelo aprender con el tiempo. El algoritmo mide su precisión a través de la función de pérdida, ajustando hasta que el error se haya minimizado lo suficiente.
-
-Yang Zhe y otros, utilizaron como datos de entrada la reflectancia de superficie y datos de salida la turbidez, utilizaron los modelos SVR (support vector regression), random forest (RF) y eXtreme Gradiente Boostring (XGBoost).
-Los hiperparámetros de cada modelo se determinaron mediante una búsqueda en cuadrícula de validación cruzada en Scikit-Learn de Python [@Yang2023].
-
-Ma Yue y otros, utilizaron varios modelos de aprendizaje automático, usaron Python 3.7 tanto para la predicción de la turbidez del agua y la optimización de la los hiperparámetros [@Ma2021].
-
-Zhao y otros probaron 14 modelos de machine learning en un estanque de peces con un dispositivo de construction propia, de los cuales ETR, Bagging, RFR, and ABR son los que presentaron un mejor desempeño en la estimación de la turbidez. Los algoritmos se implementaron utilizando Python 3.6 y bibliotecas de aprendizaje
-scikit [@Zhao2022].
-
-:::: {.content-visible when-format="html"}
-
-::: {.column-screen-right}
-
-|Modelo de machine learning|Cuerpo de agua|Métricas|Plataforma| Referencia |
-|:--|:--|:--|:--|:-:|
-|SVR, ELM ,BP ,CART ,GBT ,RF ,KNN|Lagos|RMSE, $R^{2}$, MAE|Sentinel-MSI|@Ma2021|
-|eXtreme Gradient Boosting (XGBoost),  support vector regression (SVR), random forest (RF)|Lago|RMSE, $R^{2}$, MAPE| Sentinel-2A/B y Landsat-8/9 |  @Yang2023 |
-| linear regression (LR), ridge regression (RR),  least absolute shrinkage and selection operator regression(LASSO), elastic net regression (ENR),  k-nearest neighbor regression (KNN), Gaussian process regression (GPR), decision tree regression (DTR), support vector regression (SVR), multilayer perceptron regression (MLP), adaptive boosting regression (ABR), gradient boosting regression (GBR), bootstrap aggregating regression (Bagging), random forest regression (RFR), and extreme tree regression (ETR) | Estanque de peces | MAE, MRSE, MAPE, $R^{2}$, RE, Acc |Propia| @Zhao2022 |
-
-: Características principales de algoritmos de aprendizaje automático para la estimación de turbidez. {#tbl-turb-machine .striped .hover tbl-colwidths="[50,13,13,14,10]"}
+El coeficiente de determinación (R<sup>2</sup>) es: `{r} round(py$p_r2, 3)`.
 
 :::
 
-::::
+Visualizo los resultados comparando el conjunto de entrenamiento y validación.
 
-## Desarrollo del algo
+::: {.column-body-outset}
 
-### metodos trad
+```{python}
+fig, ax = plt.subplots(ncols=2, figsize=(10, 5), sharex=True, sharey=True)
 
-### ML
+ax[0].plot(
+    X_train,
+    regressor.predict(X_train),
+    linewidth=3,
+    color="#17A77E",
+    label="Modelo",
+)
+ax[0].scatter(X_train, y_train, label="Entrenamiento", color = "#9D50A6", alpha = .6)
+ax[0].set(xlabel="Característica", ylabel="Objetivo", title="Conjunto de entrenamiento")
+ax[0].legend()
 
+ax[1].plot(X_test, y_pred, linewidth=3, color="#17A77E", label="Modelo")
+ax[1].scatter(X_test, y_test, label="Validación", color = "#9D50A6", alpha = .6)
+ax[1].set(xlabel="Característica", ylabel="Objetivo", title="Conjunto de validación")
+ax[1].legend()
+
+fig.suptitle("Regresión lineal")
+
+plt.show()
+```
+
+:::
+
+## **R**, con `tidymodels`
+
+Cargo los paquetes.
+
+```{r}
+#| warning: false
+library(tidyverse)
+library(tidymodels)
+```
+
+Divido el conjunto de datos en entrenamiento y validación.
+
+```{r}
+penguins <- palmerpenguins::penguins
+
+set.seed(2025)
+penguins_split <- initial_split(penguins, strata = body_mass_g)
+penguins_train <- training(penguins_split)
+penguins_test  <- testing(penguins_split)
+```
+
+Creo un modelo lineal y una *receta*.
+
+```{r}
+lm_model <- linear_reg() |> 
+  set_engine("lm")
+
+lm_recipe <- recipe(body_mass_g ~ bill_length_mm, data = penguins_train)
+```
+
+Combino el modelo con la receta en un *workflow* y ajusto con los datos de entrenamiento.
+
+```{r}
+lm_wflow <- workflow(
+  preprocessor = lm_recipe,
+  spec = lm_model
+)
+
+lm_fit <- fit(lm_wflow, penguins_train)
+```
+
+Genero estimaciones a partir de los datos de validación y el modelo generado.
+
+```{r}
+penguins_test_res <- predict(
+  lm_fit, new_data = select(penguins_test, -body_mass_g)
+) |> 
+  bind_cols(select(penguins_test, body_mass_g))
+```
+
+Las métricas de desempeño resultan:
+
+```{r}
+r_rmse <- yardstick::rmse(penguins_test_res, truth = body_mass_g, estimate = .pred)
+r_r2 <- yardstick::rsq(penguins_test_res, truth = body_mass_g, estimate = .pred)
+```
+
+::: {.callout-note icon="false" title="Métricas de desempeño"}
+
+El error cuadrático medio (RMSE): `{r} round(r_rmse$.estimate, 3)`.
+
+El coeficiente de determinación (R<sup>2</sup>): `{r} round(r_r2$.estimate, 3)`.
+
+:::
+
+Comparo las estimaciones con los valores reales.
+
+```{r}
+ggplot(penguins_test_res, aes(body_mass_g, .pred)) +
+  geom_smooth(se = FALSE, method = "lm", formula = y ~ x, color = "#17A77E") +
+  geom_point(color = "#9D50A6", alpha = .6) +
+  labs(x = "Valor medido", y = "Valor estimado") +
+  theme_bw() +
+  theme(
+    aspect.ratio = 1
+  )
+```
+
+Más recursos:
+
+* [Tutoriales](https://www.tidymodels.org/start/) de `{tidymodels}`.
+
+* [Tidy Modeling with R](https://www.tmwr.org/).
 
 
