@@ -3162,7 +3162,7 @@ vertical-align: -.125em;
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Utilizo el conjunto de datos <code>diabetes</code>. Lo divido en entrenamiento y validación.</p>
+<p>Cargo los datos de interés y divido en entrenamiento y validación.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> load_diabetes(return_X_y<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X[:, [<span class="dv">2</span>]]  <span class="co"># Use only one feature</span></span>
@@ -3170,11 +3170,11 @@ vertical-align: -.125em;
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  X, y, test_size<span class="op">=</span><span class="dv">20</span>, shuffle<span class="op">=</span><span class="va">False</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Creo un modelo de regresión y ajusto a los datos de entrenamiento.</p>
+<p>Creo un modelo de regresión y ajusto utilizando los datos de entrenamiento.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>regressor <span class="op">=</span> LinearRegression().fit(X_train, y_train)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Evalúo el modelo a partir de las <strong>métricas de desempeño</strong>.</p>
+<p>Evalúo el modelo generado a partir de las <strong>métricas de desempeño</strong>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> regressor.predict(X_test)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>p_rmse <span class="op">=</span> mean_squared_error(y_test, y_pred)</span>
@@ -3230,7 +3230,7 @@ Métricas de desempeño
 </section>
 <section id="r-con-tidymodels" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="r-con-tidymodels"><span class="header-section-number">2</span> <strong>R</strong>, con <code>tidymodels</code></h2>
-<p>Cargo los paquetes.</p>
+<p>Cargo los paquetes para el procesamiento de datos y desarrollo del modelo.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3244,7 +3244,7 @@ Métricas de desempeño
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>penguins_train <span class="ot">&lt;-</span> <span class="fu">training</span>(penguins_split)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>penguins_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(penguins_split)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Creo un modelo lineal y una <em>receta</em>.</p>
+<p>Creo un modelo lineal y una <em>receta</em> que relacione las variables de interés.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;lm&quot;</span>)</span>
@@ -3260,7 +3260,7 @@ Métricas de desempeño
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>lm_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(lm_wflow, penguins_train)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Genero estimaciones a partir de los datos de validación y el modelo generado.</p>
+<p>Genero estimaciones a partir de los datos de validación con el modelo obtenido.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>penguins_test_res <span class="ot">&lt;-</span> <span class="fu">predict</span>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  lm_fit, <span class="at">new_data =</span> <span class="fu">select</span>(penguins_test, <span class="sc">-</span>body_mass_g)</span>
@@ -3286,7 +3286,7 @@ Métricas de desempeño
 <p>El coeficiente de determinación (R<sup>2</sup>): 0.322.</p>
 </div>
 </div>
-<p>Comparo las estimaciones con los valores reales.</p>
+<p>Comparo las estimaciones dadas por el modelo con los valores reales.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(penguins_test_res, <span class="fu">aes</span>(body_mass_g, .pred)) <span class="sc">+</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">formula =</span> y <span class="sc">~</span> x, <span class="at">color =</span> <span class="st">&quot;#17A77E&quot;</span>) <span class="sc">+</span></span>
